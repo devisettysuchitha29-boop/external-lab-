@@ -1,0 +1,83 @@
+Here is a **short, minimal CRUD notes app** using **localStorage** — no styling, only essential functionality:
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>Student Notes (CRUD + LocalStorage)</h2>
+
+  <input id="title" placeholder="Title"><br><br>
+  <textarea id="content" placeholder="Note"></textarea><br><br>
+  <button onclick="saveNote()">Add / Update</button>
+
+  <h3>Notes</h3>
+  <div id="notes"></div>
+
+<script>
+  let editId = null;
+
+  function loadNotes() {
+    return JSON.parse(localStorage.getItem("notes") || "[]");
+  }
+
+  function saveNotes(notes) {
+    localStorage.setItem("notes", JSON.stringify(notes));
+  }
+
+  function render() {
+    const list = loadNotes();
+    const container = document.getElementById("notes");
+    container.innerHTML = "";
+    list.forEach(n => {
+      const div = document.createElement("div");
+      div.innerHTML = `
+        <b>${n.title}</b><br>${n.content}<br>
+        <button onclick="editNote('${n.id}')">Edit</button>
+        <button onclick="deleteNote('${n.id}')">Delete</button><hr>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function saveNote() {
+    const title = title.value.trim();
+    const content = content.value.trim();
+    if (!title || !content) return alert("Enter title & content");
+
+    let notes = loadNotes();
+
+    if (editId) {
+      let n = notes.find(n => n.id === editId);
+      n.title = title;
+      n.content = content;
+      editId = null;
+    } else {
+      notes.push({ id: Date.now(), title, content });
+    }
+
+    saveNotes(notes);
+    title.value = content.value = "";
+    render();
+  }
+
+  function editNote(id) {
+    const n = loadNotes().find(n => n.id == id);
+    title.value = n.title;
+    content.value = n.content;
+    editId = id;
+  }
+
+  function deleteNote(id) {
+    let notes = loadNotes().filter(n => n.id != id);
+    saveNotes(notes);
+    render();
+  }
+
+  render();
+</script>
+
+</body>
+</html>
+```
+
+If you want an even **shorter** version or want **styling added**, just tell me!
